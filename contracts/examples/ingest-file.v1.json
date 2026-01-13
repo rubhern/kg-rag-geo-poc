@@ -1,0 +1,19 @@
+{
+  "event_id": "2c3c2f6f-2d10-4b08-9b9b-4c9d1b2a9caa",
+  "event_type": "ingest.file",
+  "schema_version": "1.0.0",
+  "source": "ingestor-file",
+  "event_time": "2026-01-13T08:10:00Z",
+  "ingest_time": "2026-01-13T08:10:03Z",
+  "idempotency_key": "ingest-file:traffic_incidents:2026-01-13:fileA.csv",
+  "trace": { "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736", "span_id": "00f067aa0ba902b7" },
+  "tags": { "env": "local", "tenant": "demo" },
+  "payload": {
+    "dataset": "traffic_incidents",
+    "raw_uri": "s3://raw/traffic_incidents/2026/01/13/ingestor-file/2c3c2f6f-2d10-4b08-9b9b-4c9d1b2a9caa/payload.csv",
+    "content_type": "csv",
+    "checksum": "sha256:9d7b2d3a5c8e4e2b8c4a7d11f1b7a0b3e4d7c9a8f0e1d2c3b4a5968776655443",
+    "record_count": 1532,
+    "source_file_name": "fileA.csv"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "event_id": "6c8b9e1a-0f4a-4a67-b8f0-6bbf0f4f8e29",
+  "event_type": "ingest.stream",
+  "schema_version": "1.0.0",
+  "source": "ingestor-stream",
+  "event_time": "2026-01-13T08:15:10Z",
+  "ingest_time": "2026-01-13T08:15:11Z",
+  "idempotency_key": "ingest-stream:poc.source.events:3:120045",
+  "trace": { "trace_id": "9f2c1d0e3b4a59687766554433221100", "span_id": "1a2b3c4d5e6f7081" },
+  "tags": { "env": "local", "tenant": "demo" },
+  "payload": {
+    "dataset": "atm_events",
+    "topic": "poc.source.events",
+    "partition": 3,
+    "offset": 120045,
+    "key": "atm-ES-VA-001",
+    "raw_uri": "s3://raw/atm_events/2026/01/13/ingestor-stream/6c8b9e1a-0f4a-4a67-b8f0-6bbf0f4f8e29/payload.json",
+    "source_event_id": "upstream-evt-88997766"
+  }
+}

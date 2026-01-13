@@ -1,0 +1,52 @@
+flowchart TB
+%% Day 1 POC - Container View
+    subgraph Network[Docker Compose Network]
+        direction TB
+
+        subgraph Ingestion[Ingestion]
+            ing_file[ingestor-file]
+            ing_http[ingestor-http]
+            ing_stream[ingestor-stream]
+        end
+
+        subgraph Platform[Platform]
+            broker[Kafka/Redpanda]
+            obj[Object Storage -- MinIO or equivalent]
+            pg[(PostgreSQL + PostGIS)]
+        end
+
+        subgraph Processing[Processing]
+            curator[curator job -- dbt / custom]
+        end
+
+        subgraph Observability[Observability]
+            otel[OpenTelemetry Collector]
+            prom[Prometheus -- optional]
+            graf[Grafana]
+        end
+
+        subgraph Serving[Serving]
+            agent[agent-api -- optional]
+        end
+
+        ing_file --> obj
+        ing_http --> obj
+        ing_stream --> obj
+
+        ing_file --> broker
+        ing_http --> broker
+        ing_stream --> broker
+
+        broker --> curator
+        curator --> pg
+        curator --> broker
+
+        agent --> pg
+
+        ing_file --> otel
+        curator --> otel
+        agent --> otel
+
+        graf --> prom
+        graf --> pg
+    end

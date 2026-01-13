@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/contracts/events/envelope.v1.schema.json",
+  "title": "EventEnvelopeV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "event_id",
+    "event_type",
+    "schema_version",
+    "source",
+    "event_time",
+    "ingest_time",
+    "payload"
+  ],
+  "properties": {
+    "event_id": { "type": "string", "format": "uuid" },
+    "event_type": { "type": "string", "minLength": 3 },
+    "schema_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "source": { "type": "string", "minLength": 2 },
+    "event_time": { "type": "string", "format": "date-time" },
+    "ingest_time": { "type": "string", "format": "date-time" },
+
+    "idempotency_key": { "type": "string", "minLength": 8 },
+
+    "trace": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "trace_id": { "type": "string" },
+        "span_id": { "type": "string" }
+      }
+    },
+
+    "tags": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+
+    "payload": { "type": "object" }
+  }
+}

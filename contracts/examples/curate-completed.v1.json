@@ -1,0 +1,24 @@
+{
+  "event_id": "a2c7d1a8-5f3e-4f6d-bb67-09b2b874f9d1",
+  "event_type": "curate.completed",
+  "schema_version": "1.0.0",
+  "source": "curator",
+  "event_time": "2026-01-13T08:20:00Z",
+  "ingest_time": "2026-01-13T08:20:00Z",
+  "idempotency_key": "curate-completed:traffic_incidents:job=curate-20260113-0820",
+  "trace": { "trace_id": "0aa1bb2cc3dd4ee5ff6677889900aabb", "span_id": "1122334455667788" },
+  "tags": { "env": "local", "tenant": "demo" },
+  "payload": {
+    "dataset": "traffic_incidents",
+    "job_id": "curate-20260113-0820",
+    "status": "SUCCESS",
+    "input_event_id": "2c3c2f6f-2d10-4b08-9b9b-4c9d1b2a9caa",
+    "output": {
+      "postgres_schema": "curated",
+      "tables": [
+        { "name": "traffic_incidents", "rows": 1532 },
+        { "name": "traffic_incidents_geo", "rows": 1532 }
+      ]
+    }
+  }
+}

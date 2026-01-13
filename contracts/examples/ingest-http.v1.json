@@ -1,0 +1,23 @@
+{
+  "event_id": "0bdfc0a1-2b6a-4f1a-88f6-1f3d5d97b9c4",
+  "event_type": "ingest.http",
+  "schema_version": "1.0.0",
+  "source": "ingestor-http",
+  "event_time": "2026-01-13T08:12:00Z",
+  "ingest_time": "2026-01-13T08:12:02Z",
+  "idempotency_key": "ingest-http:merchant_locations:https://api.example.com/v1/merchants:cursor=2026-01-13T00:00:00Z",
+  "trace": { "trace_id": "c1f0e7c2b1b54b1fa6c72b6d2b3c4d5e", "span_id": "3a2b1c0d9e8f7a6b" },
+  "tags": { "env": "local", "tenant": "demo" },
+  "payload": {
+    "dataset": "merchant_locations",
+    "endpoint": "https://api.example.com/v1/merchants?updated_since=2026-01-13T00:00:00Z",
+    "http_method": "GET",
+    "http_status": 200,
+    "raw_uri": "s3://raw/merchant_locations/2026/01/13/ingestor-http/0bdfc0a1-2b6a-4f1a-88f6-1f3d5d97b9c4/payload.json",
+    "cursor": "2026-01-13T00:00:00Z",
+    "window_start": "2026-01-13T00:00:00Z",
+    "window_end": "2026-01-13T08:12:00Z",
+    "rate_limit_remaining": 972,
+    "duration_ms": 412
+  }
+}

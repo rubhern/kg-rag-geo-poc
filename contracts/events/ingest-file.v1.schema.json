@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/contracts/events/ingest-file.v1.schema.json",
+  "title": "IngestFileEventV1",
+  "allOf": [
+    { "$ref": "envelope.v1.schema.json" },
+    {
+      "type": "object",
+      "properties": {
+        "event_type": { "const": "ingest.file" },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["dataset", "raw_uri", "content_type", "checksum"],
+          "properties": {
+            "dataset": { "type": "string", "minLength": 2 },
+            "raw_uri": { "type": "string", "minLength": 10 },
+            "content_type": { "type": "string", "enum": ["csv", "json", "geojson"] },
+            "checksum": { "type": "string", "minLength": 16 },
+            "record_count": { "type": "integer", "minimum": 0 },
+            "source_file_name": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    }
+  ]
+}

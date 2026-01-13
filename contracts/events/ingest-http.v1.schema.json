@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/contracts/events/ingest-http.v1.schema.json",
+  "title": "IngestHttpEventV1",
+  "allOf": [
+    { "$ref": "envelope.v1.schema.json" },
+    {
+      "type": "object",
+      "properties": {
+        "event_type": { "const": "ingest.http" },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["dataset", "endpoint", "http_status", "raw_uri"],
+          "properties": {
+            "dataset": { "type": "string", "minLength": 2 },
+            "endpoint": { "type": "string", "minLength": 8 },
+            "http_method": { "type": "string", "enum": ["GET", "POST"] },
+            "http_status": { "type": "integer", "minimum": 100, "maximum": 599 },
+
+            "raw_uri": { "type": "string", "minLength": 10 },
+
+            "cursor": { "type": "string" },
+            "window_start": { "type": "string", "format": "date-time" },
+            "window_end": { "type": "string", "format": "date-time" },
+
+            "rate_limit_remaining": { "type": "integer", "minimum": 0 },
+            "duration_ms": { "type": "integer", "minimum": 0 }
+          }
+        }
+      }
+    }
+  ]
+}

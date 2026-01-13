@@ -1,0 +1,169 @@
+services:
+  postgres:
+    build:
+      context: ./docker/postgres
+    container_name: poc-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${PG_PORT}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.104.0
+    container_name: poc-otel-collector
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    volumes:
+      - ./docker/otel/otel-collector.yaml:/etc/otelcol-contrib/config.yaml:ro
+    ports:
+      - "${OTEL_OTLP_GRPC_PORT}:4317"
+      - "${OTEL_OTLP_HTTP_PORT}:4318"
+    depends_on:
+      loki:
+        condition: service_started
+      tempo:
+        condition: service_started
+
+  loki:
+    image: grafana/loki:3.2.0
+    container_name: poc-loki
+    command: ["-config.file=/etc/loki/config.yaml"]
+    volumes:
+      - ./docker/loki/loki-config.yml:/etc/loki/config.yaml:ro
+      - loki:/loki
+    ports:
+      - "${LOKI_PORT}:3100"
+
+  tempo:
+    image: grafana/tempo:2.6.0
+    container_name: poc-tempo
+    command: ["-config.file=/etc/tempo/tempo.yaml"]
+    volumes:
+      - ./docker/tempo/tempo.yml:/etc/tempo/tempo.yaml:ro
+      - tempo:/var/tempo
+    ports:
+      - "${TEMPO_HTTP_PORT}:3200"
+      - "4319:4317"
+
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    container_name: poc-prometheus
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "${PROMETHEUS_PORT}:9090"
+
+  grafana:
+    image: grafana/grafana:11.2.1
+    container_name: poc-grafana
+    ports:
+      - "${GRAFANA_PORT}:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - grafana:/var/lib/grafana
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      - prometheus
+      - loki
+      - tempo
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.1
+    container_name: poc-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      KAFKA_OPTS: "-Dzookeeper.4lw.commands.whitelist=ruok,srvr,stat"
+    healthcheck:
+      test: ["CMD-SHELL", "echo ruok | nc -w 2 localhost 2181 | grep imok"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.1
+    container_name: poc-kafka
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    ports:
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+
+      KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT"
+      KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
+
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    healthcheck:
+      test: [ "CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --list >/dev/null 2>&1 || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: poc-kafka-ui
+    depends_on:
+      kafka:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: "kafka:9092"
+
+  minio:
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z-cpuv1
+    container_name: poc-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    ports:
+      - "${MINIO_PORT}:9000"
+      - "${MINIO_CONSOLE_PORT}:9001"
+    volumes:
+      - minio:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  minio-init:
+    image: minio/mc:latest
+    container_name: poc-minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD} &&
+      mc mb -p local/${MINIO_BUCKET_RAW} || true &&
+      mc anonymous set download local/${MINIO_BUCKET_RAW} || true
+      "
+    restart: "no"
+
+volumes:
+  pgdata:
+  minio:
+  grafana:
+  loki:
+  tempo:

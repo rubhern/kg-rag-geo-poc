@@ -1,0 +1,47 @@
+{
+  "event_id": "f7b8c9d0-1e2f-4a5b-9c0d-11aa22bb33cc",
+  "event_type": "kg.episode",
+  "schema_version": "1.0.0",
+  "source": "kg-extractor",
+  "event_time": "2026-01-13T08:25:00Z",
+  "ingest_time": "2026-01-13T08:25:01Z",
+  "idempotency_key": "kg-episode:traffic_incidents:episode=20260113-0825",
+  "trace": { "trace_id": "abcdef0123456789abcdef0123456789", "span_id": "cafebabedeadbeef" },
+  "tags": { "env": "local", "tenant": "demo" },
+  "payload": {
+    "dataset": "traffic_incidents",
+    "episode_id": "episode-20260113-0825",
+    "entities": [
+      {
+        "id": "incident:ES:VA:20260113:0001",
+        "type": "Incident",
+        "label": "Traffic incident #0001",
+        "properties": {
+          "severity": "HIGH",
+          "occurred_at": "2026-01-13T08:09:30Z",
+          "lat": 41.6523,
+          "lon": -4.7245
+        }
+      },
+      {
+        "id": "location:ES:VA:Valladolid",
+        "type": "Location",
+        "label": "Valladolid",
+        "properties": {
+          "country": "ES",
+          "region": "Castilla y León"
+        }
+      }
+    ],
+    "relations": [
+      {
+        "from": "incident:ES:VA:20260113:0001",
+        "to": "location:ES:VA:Valladolid",
+        "type": "OCCURRED_IN",
+        "properties": {
+          "confidence": 0.98
+        }
+      }
+    ]
+  }
+}

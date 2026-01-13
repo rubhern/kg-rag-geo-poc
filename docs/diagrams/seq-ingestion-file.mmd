@@ -1,0 +1,25 @@
+sequenceDiagram
+  autonumber
+  participant F as File Ingestor
+  participant S as JSON Schema Validator
+  participant O as RAW Object Storage
+  participant K as Kafka/Redpanda
+  participant C as Curator
+  participant P as PostgreSQL/PostGIS
+  participant D as Dashboards/Agent
+
+  Note over F,S: Build event + validate contract
+  F->>S: validate(ingest.file.v1)
+  alt valid
+    F->>O: PUT raw payload (payload.csv/json)
+    F->>K: publish ingest.file(event with raw_uri)
+    K-->>C: ingest.file event
+    C->>S: validate(envelope + ingest.file)
+    C->>O: GET raw payload (raw_uri)
+    C->>P: load curated tables
+    C->>K: publish curate.completed
+    K-->>D: curate.completed event (optional)
+    D->>P: query curated data
+  else invalid
+    F-->>F: quarantine / DLQ + log reason
+  end

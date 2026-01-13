@@ -1,0 +1,28 @@
+flowchart LR
+%% Day 1 POC - System Context
+  ext1[External Data Sources -- File drops / APIs / Streams]
+  user[Developer / Operator]
+
+  subgraph POC[POC Platform -- Local]
+    ing[Ingestors -- file/http/stream]
+    raw[RAW Object Storage -- S3-compatible]
+    bus[Event Bus -- Kafka/Redpanda]
+    cur[Curator -- Transform/Load]
+    db[(PostgreSQL + PostGIS\nCurated)]
+    obs[Observability -- OTEL/Prom/Grafana]
+    api[Agent/API -- optional]
+    dash[Dashboards -- Grafana]
+  end
+
+  ext1 --> ing
+  ing --> raw
+  ing --> bus
+  bus --> cur
+  cur --> db
+  cur --> bus
+  api --> db
+  dash --> db
+  ing --> obs
+  cur --> obs
+  api --> obs
+  user --> POC
