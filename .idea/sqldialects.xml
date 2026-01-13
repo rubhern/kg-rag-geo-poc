@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/infra/docker/postgres/init/00-extensions.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/infra/docker/postgres/init/01_schemas.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/infra/docker/postgres/init/02_smoke.sql" dialect="PostgreSQL" />
+  </component>
+</project>
