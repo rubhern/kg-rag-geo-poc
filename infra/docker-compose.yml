@@ -162,6 +162,32 @@ services:
       "
     restart: "no"
 
+  ingestor-file:
+    build:
+      context: ../services/ingestor-file
+    container_name: poc-ingestor-file
+    profiles: [ "manual" ]
+    environment:
+      SOURCE: "file"
+      MINIO_ENDPOINT: "http://minio:9000"
+      MINIO_BUCKET_RAW: ${MINIO_BUCKET_RAW}
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      KAFKA_BOOTSTRAP: "kafka:9092"
+      KAFKA_TOPIC: "ingest.file.v1"
+      EVENT_SCHEMA_PATH: "/contracts/events/ingest-file.v1.schema.json"
+    volumes:
+      - ../contracts:/contracts:ro
+      - ./incoming:/incoming
+      - ./processed:/processed
+      - ./quarantine:/quarantine
+    depends_on:
+      minio:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    restart: "no"
+
 volumes:
   pgdata:
   minio:
