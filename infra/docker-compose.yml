@@ -188,6 +188,57 @@ services:
         condition: service_healthy
     restart: "no"
 
+  mock-api:
+    image: wiremock/wiremock:3.9.1
+    container_name: mock-api
+    ports:
+      - "8089:8080"
+    volumes:
+      - ./mock/wiremock:/home/wiremock
+    command: [ "--global-response-templating" ]
+
+  ingestor-http:
+    build:
+      context: ../services/ingestor-http
+    container_name: poc-ingestor-http
+    profiles: [ "manual" ]
+    environment:
+      # Ingest config
+      HTTP_DATASET: "merchant_locations"
+      HTTP_URL: "http://mock-api:8080/api/merchant-locations"
+      HTTP_TIMEOUT_SECONDS: "10"
+      HTTP_POLL_SECONDS: "60"
+      RUN_MODE: "once"  # "once" for smoke; change to "loop" if you want it running continuously
+
+      # MinIO (S3)
+      MINIO_ENDPOINT: "http://minio:9000"
+      MINIO_BUCKET_RAW: ${MINIO_BUCKET_RAW}
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+
+      # Kafka
+      KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+      KAFKA_TOPIC_INGEST_HTTP: "ingest.http.v1"
+
+      # Optional tags
+      ENV: "local"
+      TENANT: "demo"
+
+      # Optional schema validation
+      VALIDATE_SCHEMA: "true"
+      SCHEMA_PATH: "/contracts/events/ingest-http.v1.schema.json"
+    volumes:
+      - ../contracts:/contracts:ro
+    depends_on:
+      minio:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      mock-api:
+        condition: service_started
+    restart: "no"
+
+
 volumes:
   pgdata:
   minio:

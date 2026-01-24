@@ -1,0 +1,15 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/api/merchant-locations"
+  },
+  "response": {
+    "status": 200,
+    "fixedDelayMilliseconds": 300,
+    "headers": {
+      "Content-Type": "application/json",
+      "X-RateLimit-Remaining": "99"
+    },
+    "bodyFileName": "merchant_locations.json"
+  }
+}

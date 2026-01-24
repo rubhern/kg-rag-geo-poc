@@ -1,0 +1,8 @@
+{
+  "dataset": "merchant_locations",
+  "generated_at": "2026-01-21T10:00:00Z",
+  "items": [
+    { "id": "m-001", "name": "Coffee Bar Centro", "category": "cafe", "lat": 41.6523, "lon": -4.7245, "updated_at": "2026-01-20T12:00:00Z" },
+    { "id": "m-002", "name": "Pharmacy Norte", "category": "pharmacy", "lat": 41.6631, "lon": -4.7342, "updated_at": "2026-01-19T09:30:00Z" }
+  ]
+}
