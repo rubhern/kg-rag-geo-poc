@@ -11,7 +11,7 @@
         "payload": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["dataset", "topic", "partition", "offset"],
+          "required": ["dataset", "topic", "partition", "offset", "raw_uri"],
           "properties": {
             "dataset": { "type": "string", "minLength": 2 },
 

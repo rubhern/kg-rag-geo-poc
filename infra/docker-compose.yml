@@ -238,6 +238,54 @@ services:
         condition: service_started
     restart: "no"
 
+  ingestor-stream-consumer:
+    build:
+      context: ../services/ingestor-stream
+    container_name: poc-ingestor-stream-consumer
+    environment:
+      # Kafka (inside compose network)
+      KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+      KAFKA_TOPIC_SOURCE: "source.posts.v1"
+      KAFKA_TOPIC_INGEST: "ingest.stream.v1"
+      KAFKA_GROUP_ID: "ingestor-stream.v1"
+
+      # MinIO (IMPORTANT: no http://, no path)
+      MINIO_ENDPOINT: "minio:9000"
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKET_RAW: "raw"
+      MINIO_SECURE: "false"
+
+      # Defaults
+      DATASET: "posts"
+      ENV: "docker"
+    command: ["python", "consumer.py"]
+    depends_on:
+      kafka:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  ingestor-stream-producer:
+    build:
+      context: ../services/ingestor-stream
+    container_name: poc-ingestor-stream-producer
+    profiles: ["manual"]
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+      KAFKA_TOPIC: "source.posts.v1"
+      DATASET: "posts"
+      POSTS_PER_SEC: "5"
+      POSTS_TOTAL: "50"   # for smoke; set 0 for infinite
+    command: ["python", "producer.py"]
+    depends_on:
+      kafka:
+        condition: service_healthy
+    restart: "no"
+
 
 volumes:
   pgdata:
