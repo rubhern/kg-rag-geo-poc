@@ -117,10 +117,12 @@ chmod +x smoke_day*.sh
 ./smoke_day2.sh
 ./smoke_day3.sh
 ./smoke_day4.sh
+./smoke_day5.sh
 ```
 
 - Day 3 uses `ingestor-file` under the `manual` profile.
 - Day 4 uses `mock-api` (WireMock) + `ingestor-http` under the `manual` profile.
+- Day 5 uses `ingestor-stream-consumer` (always-on) + `ingestor-stream-producer` (manual profile) to validate streaming ingestion.
 
 ---
 
@@ -146,6 +148,15 @@ chmod +x smoke_day*.sh
   - stores the raw payload in MinIO RAW and emits `payload.raw_uri`
   - publishes an `ingest.http` event to Kafka topic `ingest.http.v1`
 - End-to-end smoke passes (`smoke_day4.sh`)
+
+### Day 5
+- Streaming ingestion validated:
+  - `ingestor-stream-producer` generates synthetic messages to Kafka topic `source.posts.v1`
+  - `ingestor-stream-consumer` consumes `source.posts.v1` and, **for each message**:
+    - stores the raw payload in MinIO RAW as an immutable object
+    - emits an `ingest.stream` event to Kafka topic `ingest.stream.v1` including `payload.raw_uri` + `topic/partition/offset`
+- End-to-end smoke passes (`smoke_day5.sh`)
+
 
 
 ## Contracts (important)
