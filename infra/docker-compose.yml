@@ -134,8 +134,8 @@ services:
     container_name: poc-minio
     command: server /data --console-address ":9001"
     environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123456
     ports:
       - "${MINIO_PORT}:9000"
       - "${MINIO_CONSOLE_PORT}:9001"
@@ -159,6 +159,7 @@ services:
       mc mb -p local/${MINIO_BUCKET_RAW} || true &&
       mc mb -p local/${MINIO_BUCKET_CURATED} || true
       mc anonymous set download local/${MINIO_BUCKET_RAW} || true
+      mc anonymous set download local/${MINIO_BUCKET_CURATED} || true
       "
     restart: "no"
 
@@ -171,8 +172,8 @@ services:
       SOURCE: "file"
       MINIO_ENDPOINT: "http://minio:9000"
       MINIO_BUCKET_RAW: ${MINIO_BUCKET_RAW}
-      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
-      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      MINIO_ACCESS_KEY: minio
+      MINIO_SECRET_KEY: minio123456
       KAFKA_BOOTSTRAP: "kafka:9092"
       KAFKA_TOPIC: "ingest.file.v1"
       EVENT_SCHEMA_PATH: "/contracts/events/ingest-file.v1.schema.json"
@@ -251,8 +252,8 @@ services:
 
       # MinIO (IMPORTANT: no http://, no path)
       MINIO_ENDPOINT: "minio:9000"
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123456
       MINIO_BUCKET_RAW: "raw"
       MINIO_SECURE: "false"
 
@@ -286,6 +287,64 @@ services:
         condition: service_healthy
     restart: "no"
 
+  hms-db:
+    image: postgres:16-alpine
+    container_name: poc-hms-db
+    environment:
+      POSTGRES_DB: metastore_db
+      POSTGRES_USER: hive
+      POSTGRES_PASSWORD: hive
+    volumes:
+      - hmsdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U hive -d metastore_db" ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  hive-metastore:
+    build:
+      context: ./docker/hive-metastore
+    container_name: poc-hive-metastore
+    depends_on:
+      hms-db:
+        condition: service_healthy
+    environment:
+      AWS_ACCESS_KEY_ID: minio
+      AWS_SECRET_ACCESS_KEY: minio123456
+      AWS_REGION: us-east-1
+      SERVICE_NAME: metastore
+      DB_DRIVER: postgres
+      SERVICE_OPTS: >-
+        -Djavax.jdo.option.ConnectionDriverName=org.postgresql.Driver
+        -Djavax.jdo.option.ConnectionURL=jdbc:postgresql://hms-db:5432/metastore_db
+        -Djavax.jdo.option.ConnectionUserName=hive
+        -Djavax.jdo.option.ConnectionPassword=hive
+    ports:
+      - "9083:9083"
+
+
+  trino:
+    image: trinodb/trino:479
+    container_name: poc-trino
+    depends_on:
+      hive-metastore:
+        condition: service_started
+      minio:
+        condition: service_healthy
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./docker/trino/catalog:/etc/trino/catalog:ro
+
+  dbt:
+    build:
+      context: ../services/dbt
+    volumes:
+      - ../analytics/dbt/poc_trino:/usr/app
+    depends_on:
+      trino:
+        condition: service_healthy
 
 volumes:
   pgdata:
@@ -293,3 +352,4 @@ volumes:
   grafana:
   loki:
   tempo:
+  hmsdata:

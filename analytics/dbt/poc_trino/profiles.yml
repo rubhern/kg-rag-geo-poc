@@ -1,0 +1,12 @@
+poc_trino:
+  target: dev
+  outputs:
+    dev:
+      type: trino
+      method: none
+      user: dbt
+      host: trino
+      port: 8080
+      database: hive
+      schema: raw_s3
+      threads: 4

@@ -1,0 +1,9 @@
+version: 2
+
+models:
+  - name: fct_traffic_daily
+    columns:
+      - name: traffic_date
+        tests: [not_null]
+      - name: sensor_id
+        tests: [not_null]

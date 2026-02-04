@@ -1,0 +1,18 @@
+name: "poc_trino"
+version: "1.0.0"
+profile: "poc_trino"
+
+macro-paths: ["macros"]
+model-paths: ["models"]
+
+models:
+  poc_trino:
+    stg:
+      +schema: stg_s3
+      +materialized: view
+    marts:
+      +schema: curated_s3
+      +materialized: table
+      +on_table_exists: drop
+      +properties:
+        format: "'PARQUET'"

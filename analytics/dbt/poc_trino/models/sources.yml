@@ -1,0 +1,7 @@
+version: 2
+
+sources:
+  - name: raw_s3
+    schema: raw_s3
+    tables:
+      - name: traffic_csv
