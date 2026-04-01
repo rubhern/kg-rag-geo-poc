@@ -1,0 +1,68 @@
+sequenceDiagram
+    autonumber
+    actor U as Operador
+    participant M as MinIO (S3)
+    participant T as Trino
+    participant H as Hive Metastore (HMS)
+    participant P as Postgres (hms-db)
+    participant D as dbt (dbt-trino)
+
+    Note over U,M: 1) Ingesta RAW (ya tienes el CSV en MinIO)
+    U->>M: Subir CSV a bucket raw\n(s3://raw/source=file/dt=YYYY-MM-DD/<run-id>/)
+    M-->>U: Objetos RAW disponibles
+
+    Note over U,T: 2) Preparar “capas” como schemas del catálogo Hive
+    U->>T: CREATE SCHEMA hive.raw_s3\nWITH (location='s3a://raw/hive/raw_s3/')
+    T->>H: createDatabase(raw_s3, location=s3a://...)
+    H->>P: Persistir metadatos de schema
+    P-->>H: OK
+    H-->>T: OK
+
+    U->>T: CREATE SCHEMA hive.stg_s3\nWITH (location='s3a://curated/hive/stg/')
+    T->>H: createDatabase(stg_s3, location=s3a://...)
+    H->>P: Persistir metadatos de schema
+    P-->>H: OK
+    H-->>T: OK
+
+    U->>T: CREATE SCHEMA hive.curated_s3\nWITH (location='s3a://curated/hive/curated/')
+    T->>H: createDatabase(curated_s3, location=s3a://...)
+    H->>P: Persistir metadatos de schema
+    P-->>H: OK
+    H-->>T: OK
+
+    Note over U,T: 3) Registrar tabla RAW como externa (apunta a ficheros existentes)
+    U->>T: CREATE TABLE hive.raw_s3.traffic_csv\nWITH (format='CSV', external_location='s3://raw/...', ...)
+    T->>H: createTable(traffic_csv, external_location=s3://raw/...)
+    H->>P: Persistir metadatos de tabla
+    P-->>H: OK
+    H-->>T: OK
+
+    Note over U,D: 4) Transformaciones con dbt (en contenedor)
+    U->>D: docker compose run --rm dbt debug
+    D->>T: Probar conexión (profiles.yml)
+    T-->>D: OK
+
+    Note over D,T: 5) STG: vista (tipado, parsing, normalización)
+    U->>D: docker compose run --rm dbt run -s stg_traffic
+    D->>T: CREATE OR REPLACE VIEW hive.stg_s3.stg_traffic AS SELECT ... FROM raw_s3.traffic_csv
+    T->>H: create/replaceView(stg_traffic)
+    H->>P: Persistir definición de vista
+    P-->>H: OK
+    H-->>T: OK
+    T-->>D: OK
+
+    Note over D,T: 6) MART/CURATED: tabla Parquet (agregados)
+    U->>D: docker compose run --rm dbt run -s fct_traffic_daily
+    D->>T: CREATE TABLE hive.curated_s3.fct_traffic_daily\nWITH (format='PARQUET', ...) AS SELECT ... FROM stg_traffic
+    T->>M: Leer CSV RAW (s3://raw/...) durante CTAS
+    T->>M: Escribir Parquet (s3a://curated/...) como salida
+    T->>H: createTable(fct_traffic_daily, format=PARQUET, location=s3a://curated/...)
+    H->>P: Persistir metadatos de tabla Parquet
+    P-->>H: OK
+    H-->>T: OK
+    T-->>D: OK
+
+    Note over U,T: 7) Consumo/validación
+    U->>T: SELECT ... FROM hive.curated_s3.fct_traffic_daily
+    T->>M: Leer ficheros Parquet del bucket curated
+    T-->>U: Resultados

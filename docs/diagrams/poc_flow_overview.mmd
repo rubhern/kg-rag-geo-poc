@@ -1,0 +1,16 @@
+flowchart TD
+    A([Inicio]) --> B[CSV en MinIO / bucket raw Ruta: s3://raw/source=file/dt=YYYY-MM-DD/<run-id>/]
+    B --> C[Trino: crear schemas --capas-- raw_s3, stg_s3, curated_s3 con location s3a://...]
+    C --> C1[HMS: guarda metadatos en Postgres --hms-db--]
+    C --> D[Trino: crear tabla RAW externa hive.raw_s3.traffic_csv external_location = s3://raw/...]
+    D --> D1[HMS: registra tabla y location]
+    D --> E[dbt debug --contenedor-- verifica conexión a Trino]
+    E --> F[dbt run: STG stg_traffic --VIEW-- - casting --try_cast-- - parsing timestamp - normalización categóricos   --congestion_rank, incident_flag--]
+    F --> G[dbt run: MART/CURATED fct_traffic_daily --TABLE Parquet-- - agregados - max_by--congestion, rank-- - incidents]
+    G --> H[MinIO / bucket curated Parquet en: curated/hive/curated/ ...]
+    H --> I[Validación en Trino SELECT sobre STG y CURATED + inspección de $path / $partitions]
+    I --> J{Opcional: serving}
+    J -->|Export| K[--Postgres/PostGIS--]
+    J -->|BI/Analytics| L[Dashboards / Notebooks]
+    J -->|APIs/Agents| M[Servicios backend]
+    I --> N([Fin])
