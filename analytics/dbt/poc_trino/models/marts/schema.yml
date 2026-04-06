@@ -7,3 +7,6 @@ models:
         tests: [not_null]
       - name: sensor_id
         tests: [not_null]
+  - name: mart_region_daily_kpis
+  - name: mart_traffic_sensor_geo
+  - name: dim_regions

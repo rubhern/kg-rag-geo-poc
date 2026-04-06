@@ -1,0 +1,6 @@
+"region_id","region_name","city","region_type","srid","geom_wkt","source"
+"REG-BIO","Bilbao urban area","Bilbao","CITY","4326","POLYGON((-3.035000 43.183000, -2.835000 43.183000, -2.835000 43.343000, -3.035000 43.343000, -3.035000 43.183000))","synthetic_poc_regions_v1"
+"REG-MAD","Madrid urban area","Madrid","CITY","4326","POLYGON((-3.883800 40.296800, -3.523800 40.296800, -3.523800 40.536800, -3.883800 40.536800, -3.883800 40.296800))","synthetic_poc_regions_v1"
+"REG-VLC","Valencia urban area","Valencia","CITY","4326","POLYGON((-0.516300 39.369900, -0.236300 39.369900, -0.236300 39.569900, -0.516300 39.569900, -0.516300 39.369900))","synthetic_poc_regions_v1"
+"REG-VLL","Valladolid urban area","Valladolid","CITY","4326","POLYGON((-4.828600 41.572300, -4.628600 41.572300, -4.628600 41.732300, -4.828600 41.732300, -4.828600 41.572300))","synthetic_poc_regions_v1"
+"REG-ZAZ","Zaragoza urban area","Zaragoza","CITY","4326","POLYGON((-1.009100 41.558800, -0.769100 41.558800, -0.769100 41.738800, -1.009100 41.738800, -1.009100 41.558800))","synthetic_poc_regions_v1"

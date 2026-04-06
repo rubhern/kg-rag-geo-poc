@@ -1,0 +1,195 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -3.035,
+              43.183
+            ],
+            [
+              -2.835,
+              43.183
+            ],
+            [
+              -2.835,
+              43.343
+            ],
+            [
+              -3.035,
+              43.343
+            ],
+            [
+              -3.035,
+              43.183
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "region_id": "REG-BIO",
+        "region_name": "Bilbao urban area",
+        "city": "Bilbao",
+        "region_type": "CITY",
+        "srid": 4326,
+        "source": "synthetic_poc_regions_v1"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -3.8838,
+              40.2968
+            ],
+            [
+              -3.5238,
+              40.2968
+            ],
+            [
+              -3.5238,
+              40.5368
+            ],
+            [
+              -3.8838,
+              40.5368
+            ],
+            [
+              -3.8838,
+              40.2968
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "region_id": "REG-MAD",
+        "region_name": "Madrid urban area",
+        "city": "Madrid",
+        "region_type": "CITY",
+        "srid": 4326,
+        "source": "synthetic_poc_regions_v1"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -0.5163,
+              39.3699
+            ],
+            [
+              -0.2363,
+              39.3699
+            ],
+            [
+              -0.2363,
+              39.5699
+            ],
+            [
+              -0.5163,
+              39.5699
+            ],
+            [
+              -0.5163,
+              39.3699
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "region_id": "REG-VLC",
+        "region_name": "Valencia urban area",
+        "city": "Valencia",
+        "region_type": "CITY",
+        "srid": 4326,
+        "source": "synthetic_poc_regions_v1"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -4.8286,
+              41.5723
+            ],
+            [
+              -4.6286,
+              41.5723
+            ],
+            [
+              -4.6286,
+              41.7323
+            ],
+            [
+              -4.8286,
+              41.7323
+            ],
+            [
+              -4.8286,
+              41.5723
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "region_id": "REG-VLL",
+        "region_name": "Valladolid urban area",
+        "city": "Valladolid",
+        "region_type": "CITY",
+        "srid": 4326,
+        "source": "synthetic_poc_regions_v1"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -1.0091,
+              41.5588
+            ],
+            [
+              -0.7691,
+              41.5588
+            ],
+            [
+              -0.7691,
+              41.7388
+            ],
+            [
+              -1.0091,
+              41.7388
+            ],
+            [
+              -1.0091,
+              41.5588
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "region_id": "REG-ZAZ",
+        "region_name": "Zaragoza urban area",
+        "city": "Zaragoza",
+        "region_type": "CITY",
+        "srid": 4326,
+        "source": "synthetic_poc_regions_v1"
+      }
+    }
+  ]
+}

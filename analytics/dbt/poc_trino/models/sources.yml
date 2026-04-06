@@ -5,3 +5,5 @@ sources:
     schema: raw_s3
     tables:
       - name: traffic_csv
+      - name: raw_sensor_locations
+      - name: raw_regions
